@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraderWizard - Advanced Risk Calculator</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://raw.githubusercontent.com/necolas/normalize.css/master/normalize.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 20px;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .long {
+            color: #27ae60;
+        }
+        .short {
+            color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>korayguclu.de</h1>
+        <h2>TraderWizard Risk Calculator</h2>
+        <div class="calculator">
+            <form @submit.prevent="calculateRisk">
+                <label for="entry">Entry Price:</label>
+                <input type="number" id="entry" v-model="entry" step="0.01" required>
+                
+                <label for="stop">Stop Loss Price:</label>
+                <input type="number" id="stop" v-model="stop" step="0.01" required>
+                
+                <label for="riskAmount">Risk Amount - R ($):</label>
+                <input type="number" id="riskAmount" v-model="riskAmount" required>
+                 
+                <button type="submit">Calculate Risk</button>
+            </form>
+           
+            
+            <div v-if="showResults" class="results">
+                <button type="submit" @click="changeDirection">Change Direction</button>
+                <h3>Results:</h3>
+                <p>Position Size: {{ positionSize }} shares</p>
+                <p>Risk per share: {{ riskPerShare.toFixed(2) }} $</p>
+                <div v-if="isLongTrade">
+                <h4>Long Trade:</h4>
+                <table>
+                    <tr>
+                        <th>R Multiple</th>
+                        <th>Price</th>
+                        <th>Profit/Loss</th>
+                    </tr>
+                    <tr v-for="result in longResults" :key="result.r">
+                        <td>{{ result.r }}R</td>
+                        <td>${{ result.price.toFixed(2) }}</td>
+                        <td :class="result.profit >= 0 ? 'long' : 'short'">${{ result.profit.toFixed(2) }}</td>
+                    </tr>
+                </table>
+                </div>
+                <div v-if="!isLongTrade">
+                <h4>Short Trade:</h4>
+                <table>
+                    <tr>
+                        <th>R Multiple</th>
+                        <th>Price</th>
+                        <th>Profit/Loss</th>
+                    </tr>
+                    <tr v-for="result in shortResults" :key="result.r">
+                        <td>{{ result.r }}R</td>
+                        <td>${{ result.price.toFixed(2) }}</td>
+                        <td :class="result.profit >= 0 ? 'long' : 'short'">${{ result.profit.toFixed(2) }}</td>
+                    </tr>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    entry: null,
+                    stop: null,
+                    riskAmount: 60,
+                    showResults: false,
+                    positionSize: 0,
+                    isLongTrade: true,
+                    longResults: [],
+                    shortResults: [],
+                    riskPerShare: 0,
+                }
+            },
+            methods: {
+                changeDirection(){
+                    const temp = this.entry;
+                    this.entry = this.stop;
+                    this.stop = temp;
+                    this.calculateRisk();
+                },
+                calculateRisk() {
+                    this.riskPerShare = Math.abs(this.entry - this.stop);
+                    this.positionSize = Math.floor(this.riskAmount / this.riskPerShare);
+                    this.isLongTrade = this.entry > this.stop;
+                    this.longResults = [];
+                    this.shortResults = [];
+                    
+                    [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5].forEach(r => {
+                        const longPrice = this.entry + (r * this.riskPerShare);
+                        const shortPrice = this.entry - (r * this.riskPerShare);
+                        
+                        const longProfit = (longPrice - this.entry) * this.positionSize;
+                        const shortProfit = (this.entry - shortPrice) * this.positionSize;
+                        
+                        this.longResults.push({ r, price: longPrice, profit: longProfit });
+                        this.shortResults.push({ r, price: shortPrice, profit: shortProfit });
+                    });
+                    
+                    this.showResults = true;
+                }
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
