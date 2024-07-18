@@ -169,6 +169,8 @@
                     </tr>
                 </table>
                 </div>
+                <button  @click="addMore">show more...</button>
+
             </div>
         </div>
         <div class="disclaimer">
@@ -189,6 +191,7 @@
                     longResults: [],
                     shortResults: [],
                     riskPerShare: 0,
+                    rlevels: [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5],
                 }
             },
             methods: {
@@ -205,7 +208,7 @@
                     this.longResults = [];
                     this.shortResults = [];
                     
-                    [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5].forEach(r => {
+                    for ( const r of  this.rlevels)  {
                         const longPrice = this.entry + (r * this.riskPerShare);
                         const shortPrice = this.entry - (r * this.riskPerShare);
                         
@@ -214,9 +217,18 @@
                         
                         this.longResults.push({ r, price: longPrice, profit: longProfit });
                         this.shortResults.push({ r, price: shortPrice, profit: shortProfit });
-                    });
+                    };
                     
                     this.showResults = true;
+                },
+                addMore(){
+                    const newLevels = [];
+                    const lastLevel = this.rlevels.at(-1)+1;
+                    for (let i = 0; i < 5; i++){
+                        newLevels.push(i+lastLevel)
+                    }
+                    this.rlevels = [...this.rlevels, ...newLevels];
+                    this.calculateRisk();
                 }
             }
         });
