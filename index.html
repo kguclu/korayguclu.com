@@ -5,19 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TraderWizard - Advanced Risk Calculator</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://raw.githubusercontent.com/necolas/normalize.css/master/normalize.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
             color: #333435;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
             background-color: #f4f4f4;
-         
         }
-        h1 {
+        h1, h2 {
             color: #2c3e50;
             text-align: center;
         }
@@ -27,57 +21,21 @@
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
         .results {
             margin-top: 20px;
             background-color: #ecf0f1;
             padding: 15px;
             border-radius: 4px;
         }
-        table {
+        .table-white {
             width: 100%;
+            background-color: white;
             border-collapse: collapse;
             margin-top: 10px;
             font-size: 18px;
             font-weight: bold;   
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        tr:hover {
-            background: #cfcfcf;
-        }
-        th {
-            background-color: #3498db;
-            color: #fff;
-        }
+
         .long {
             color: #27ae60;
         }
@@ -96,27 +54,28 @@
     </style>
 </head>
 <body>
-    <div id="app">
+    <div id="app" class="container">
         <h1>Koray Güçlü</h1>
         <h2>TraderWizard Risk Calculator</h2>
         <div class="calculator">
             <form @submit.prevent="calculateRisk">
-                <label for="entry">Entry Price:</label>
-                <input type="number" id="entry" v-model="entry" step="0.01" required>
-                
-                <label for="stop">Stop Loss Price:</label>
-                <input type="number" id="stop" v-model="stop" step="0.01" required>
-                
-                <label for="riskAmount">Risk Amount - R ($):</label>
-                <input type="number" id="riskAmount" v-model="riskAmount" required>
-                 
-                <button type="submit">Calculate Risk</button>
+                <div class="form-group">
+                    <label for="entry">Entry Price:</label>
+                    <input type="number" id="entry" v-model="entry" step="0.01" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="stop">Stop Loss Price:</label>
+                    <input type="number" id="stop" v-model="stop" step="0.01" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="riskAmount">Risk Amount - R ($):</label>
+                    <input type="number" id="riskAmount" v-model="riskAmount" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Calculate Risk</button>
             </form>
-           
             
             <div v-if="showResults" class="results">
-                <button type="submit" @click="changeDirection">Change Direction</button>
-                <table>
+                <table class="table table-bordered table-responsive-sm  table-hover table-dark" >
                     <tr>
                       <th>Direction</th>
                       <th>Shares</th>
@@ -130,50 +89,53 @@
                       <td><span v-if="isLongTrade">Long</span><span v-if="!isLongTrade">Short</span> {{ positionSize }}@{{ entry }} SL {{ stop}}</td>
                     </tr>
                   </table>                
+                  <button type="submit" @click="changeDirection" class="btn btn-secondary btn-block mb-3">Change Direction</button>
 
                 <div v-if="isLongTrade">
-                <table>
+                <table class="table table-bordered table-responsive-sm table-bordered table-hover table-white">
                     <tr>
-                        <th colspan="2">R Multiple</th>
+                        <th>R Multiple</th>
                         <th>Price</th>
-                        <th>Profit/Loss</th>
+                        <th>PnL</th>
+                        <th></th>
                     </tr>
                     <tr v-for="result in longResults" :key="result.r" :class="{
                         'stoploss': result.r === -1,
                         'breakeven': result.r === 0,
                         'target2r': result.r === 2,
                         }">
-                        <td> <span v-if="result.r === -1"> Stoploss</span><span v-if="result.r === 0"> Breakeven</span><span v-if="result.r === 2"> Target</span></td>
                         <td>{{ result.r }}R</td>
                         <td>${{ result.price.toFixed(2) }}</td>
                         <td :class="result.profit >= 0 ? 'long' : 'short'">${{ result.profit.toFixed(2) }}</td>
+                        <td> <span v-if="result.r === -1"> Stoploss</span><span v-if="result.r === 0"> Breakeven</span><span v-if="result.r === 2"> Target</span></td>
                     </tr>
                 </table>
                 </div>
                 <div v-if="!isLongTrade">
-                <table>
+                <table class="table table-bordered table-responsive-sm table-bordered table-hover table-white">
                     <tr>
-                        <th colspan="2">R Multiple</th>
+                        <th>R Multiple</th>
                         <th>Price</th>
-                        <th>Profit/Loss</th>
+                        <th>PnL</th>
+                        <th></th>
                     </tr>
                     <tr v-for="result in shortResults" :key="result.r" :class="{
                         'stoploss': result.r === -1,
                         'breakeven': result.r === 0,
                         'target2r': result.r === 2,
                         }">
-                        <td> <span v-if="result.r === -1"> Stoploss</span><span v-if="result.r === 0"> Breakeven</span><span v-if="result.r === 2"> Target</span></td>
+
                         <td>{{ result.r }}R</td>
                         <td>${{ result.price.toFixed(2) }}</td>
                         <td :class="result.profit >= 0 ? 'long' : 'short'">${{ result.profit.toFixed(2) }}</td>
+                        <td> <span v-if="result.r === -1"> Stoploss</span><span v-if="result.r === 0"> Breakeven</span><span v-if="result.r === 2"> Target</span></td>
                     </tr>
                 </table>
                 </div>
-                <button  @click="addMore">show more...</button>
-
+                <button @click="addMore" class="btn btn-info btn-block">Show more...</button>
             </div>
         </div>
-        <div class="disclaimer">
+        <div class="disclaimer mt-4">
             <p><strong>Disclaimer:</strong> This trade risk calculator is provided for informational purposes only. It comes with no warranty, express or implied. Use this tool at your own risk. The calculations and results should not be considered as financial advice. Always consult with a qualified financial professional before making any investment or trading decisions.</p>
         </div>
     </div>
