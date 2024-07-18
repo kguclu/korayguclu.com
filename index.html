@@ -115,12 +115,23 @@
            
             
             <div v-if="showResults" class="results">
-                <h3>Results:</h3>
-                <p>Position Size: {{ positionSize }} shares</p>
-                <p>Risk per share: {{ riskPerShare.toFixed(2) }} $</p>
                 <button type="submit" @click="changeDirection">Change Direction</button>
+                <table>
+                    <tr>
+                        <th>Direction</th>
+                        <th>Position Size</th>
+                      <th>Risk per share</th>
+                      <th>Trade</th>
+                    </tr>
+                    <tr>
+                        <td><span v-if="isLongTrade">Long</span><span v-if="!isLongTrade">Short</span></td>
+                      <td>{{ positionSize }} shares</td>
+                      <td>{{ riskPerShare.toFixed(2) }} $</td>
+                      <td><span v-if="isLongTrade">Long</span><span v-if="!isLongTrade">Short</span> {{ positionSize }}@{{ entry }} SL {{ stop}}</td>
+                    </tr>
+                  </table>                
+
                 <div v-if="isLongTrade">
-                <h4>Long Trade:</h4>
                 <table>
                     <tr>
                         <th colspan="2">R Multiple</th>
@@ -140,14 +151,13 @@
                 </table>
                 </div>
                 <div v-if="!isLongTrade">
-                <h4>Short Trade:</h4>
                 <table>
                     <tr>
                         <th colspan="2">R Multiple</th>
                         <th>Price</th>
                         <th>Profit/Loss</th>
                     </tr>
-                    <tr v-for="result in longResults" :key="result.r" :class="{
+                    <tr v-for="result in shortResults" :key="result.r" :class="{
                         'stoploss': result.r === -1,
                         'breakeven': result.r === 0,
                         'target2r': result.r === 2,
