@@ -118,15 +118,15 @@
                 <button type="submit" @click="changeDirection">Change Direction</button>
                 <table>
                     <tr>
-                        <th>Direction</th>
-                        <th>Position Size</th>
-                      <th>Risk per share</th>
+                      <th>Direction</th>
+                      <th>Shares</th>
+                      <th>Risk per share $</th>
                       <th>Trade</th>
                     </tr>
                     <tr>
                         <td><span v-if="isLongTrade">Long</span><span v-if="!isLongTrade">Short</span></td>
-                      <td>{{ positionSize }} shares</td>
-                      <td>{{ riskPerShare.toFixed(2) }} $</td>
+                      <td>{{ positionSize }}</td>
+                      <td>{{ riskPerShare.toFixed(2) }}</td>
                       <td><span v-if="isLongTrade">Long</span><span v-if="!isLongTrade">Short</span> {{ positionSize }}@{{ entry }} SL {{ stop}}</td>
                     </tr>
                   </table>                
