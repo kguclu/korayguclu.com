@@ -60,12 +60,12 @@
             <div class="calculator">
                 <form @submit.prevent="calculateRisk">
                     <div class="form-group">
-                        <label for="entry">Entry Price:</label>
+                        <label for="entry">Entry Price*:</label>
                         <input type="number" id="entry" v-model="entry"
                             step="0.01" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="stop">Stop Loss Price:</label>
+                        <label for="stop">Stop Loss Price*:</label>
                         <input type="number" id="stop" v-model="stop"
                             step="0.01" class="form-control" required>
                     </div>
@@ -82,7 +82,7 @@
                                 <th>PnL $</th>
                             </tr>
                             <tr>
-                                <td>{{ targetInfo.rLevel }}R</td>
+                                <td>{{ targetInfo.rLevel.toFixed(1) }}R</td>
                                 <td>{{ customTarget.toFixed(2) }}</td>
                                 <td>{{ targetInfo.profitAtTarget.toFixed(2) }}</td>
                             </tr>
@@ -216,14 +216,14 @@
             computed: {
                 targetInfo() {
                     if (this.customTarget && this.entry && this.positionSize) {
-                        const targetR = (this.customTarget - this.entry) / this.riskPerShare; // Calculate R level
+                        const R = Math.abs(this.entry - this.stop)  ; // Calculate R level
                         const centsToTarget = this.customTarget - this.entry;
-                        const profitAtTarget = (this.customTarget - this.entry) * this.positionSize;
-
+                        const profitAtTarget = Math.abs(this.customTarget - this.entry) * this.positionSize;
+                        const targetR = Math.abs(this.customTarget - this.entry)/R;
                         return {
                             rLevel: targetR,
                             centsToTarget: centsToTarget,
-                            profitAtTarget: profitAtTarget,
+                            profitAtTarget: Math.abs(profitAtTarget),
                         };
                     }
                     return null;
