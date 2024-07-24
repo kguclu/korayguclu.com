@@ -75,16 +75,16 @@
                             step="0.01" class="form-control">
                     </div>
                     <div>
-                        <table v-if="customTarget"class="table table-bordered table-responsive-sm table-hover table-white">
+                        <table v-if="customTarget" class="table table-bordered table-responsive-sm table-hover table-white">
                             <tr>
                                 <th>R Level</th>
                                 <th>Target Price $</th>
                                 <th>PnL $</th>
                             </tr>
-                            <tr >
-                                <td>{{ targetRLevel }}R</td>
+                            <tr>
+                                <td>{{ targetInfo.rLevel }}R</td>
                                 <td>{{ customTarget.toFixed(2) }}</td>
-                                <td>{{ targetProfit.toFixed(2) }}</td>
+                                <td>{{ targetInfo.profitAtTarget.toFixed(2) }}</td>
                             </tr>
                         </table>
                     </div>
@@ -227,9 +227,22 @@
                     shortResults: [],
                     riskPerShare: 0,
                     rlevels: [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5],
-                    targetInfo: null,
-                    targetRLevel: 0,
-                    targetProfit: 0,
+                }
+            },
+            computed: {
+                targetInfo() {
+                    if (this.customTarget && this.entry && this.positionSize) {
+                        const targetR = (this.customTarget - this.entry) / this.riskPerShare; // Calculate R level
+                        const centsToTarget = this.customTarget - this.entry;
+                        const profitAtTarget = (this.customTarget - this.entry) * this.positionSize;
+
+                        return {
+                            rLevel: targetR,
+                            centsToTarget: centsToTarget,
+                            profitAtTarget: profitAtTarget,
+                        };
+                    }
+                    return null;
                 }
             },
             methods: {
@@ -267,21 +280,6 @@
                     }
                     this.rlevels = [...this.rlevels, ...newLevels];
                     this.calculateRisk();
-                },
-                showTarget() {
-                    const targetPrice = this.customTarget; // Use custom target price
-                    const targetR = (targetPrice - this.entry) / this.riskPerShare; // Calculate R level
-                    const centsToTarget = targetPrice - this.entry;
-                    const profitAtTarget = (targetPrice - this.entry) * this.positionSize;
-
-                    this.targetInfo = {
-                        rLevel: targetR,
-                        centsToTarget: centsToTarget,
-                        profitAtTarget: profitAtTarget,
-                    };
-
-                    this.targetRLevel = targetR; // Set the calculated R level
-                    this.targetProfit = profitAtTarget; // Set the calculated profit
                 }
             }
         });
