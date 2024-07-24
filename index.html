@@ -163,6 +163,13 @@
                     </div>
                     <button @click="addMore" class="btn btn-info btn-block">Show
                         more...</button>
+                    <button @click="showTarget" class="btn btn-warning btn-block mb-3">Show Target</button>
+                    <div v-if="targetInfo" class="results">
+                        <h4>Target Information</h4>
+                        <p>R Level: {{ targetInfo.rLevel }}R</p>
+                        <p>Cents to Target: {{ targetInfo.centsToTarget.toFixed(2) }}</p>
+                        <p>Profit at Target: {{ targetInfo.profitAtTarget.toFixed(2) }}</p>
+                    </div>
                 </div>
             </div>
             <div class="disclaimer mt-4">
@@ -191,6 +198,7 @@
                     shortResults: [],
                     riskPerShare: 0,
                     rlevels: [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5],
+                    targetInfo: null,
                 }
             },
             methods: {
@@ -228,6 +236,18 @@
                     }
                     this.rlevels = [...this.rlevels, ...newLevels];
                     this.calculateRisk();
+                },
+                showTarget() {
+                    const targetR = 2; // Assuming target is at 2R
+                    const targetPrice = this.entry + (targetR * this.riskPerShare);
+                    const centsToTarget = targetPrice - this.entry;
+                    const profitAtTarget = (targetPrice - this.entry) * this.positionSize;
+
+                    this.targetInfo = {
+                        rLevel: targetR,
+                        centsToTarget: centsToTarget,
+                        profitAtTarget: profitAtTarget,
+                    };
                 }
             }
         });
