@@ -166,9 +166,18 @@
                     <button @click="showTarget" class="btn btn-warning btn-block mb-3">Show Target</button>
                     <div v-if="targetInfo" class="results">
                         <h4>Target Information</h4>
-                        <p>R Level: {{ targetInfo.rLevel }}R</p>
-                        <p>Cents to Target: {{ targetInfo.centsToTarget.toFixed(2) }}</p>
-                        <p>Profit at Target: {{ targetInfo.profitAtTarget.toFixed(2) }}</p>
+                        <table class="table table-bordered table-responsive-sm table-hover table-white">
+                            <tr>
+                                <th>R Level</th>
+                                <th>Cents to Target</th>
+                                <th>Profit at Target</th>
+                            </tr>
+                            <tr>
+                                <td>{{ targetInfo.rLevel }}R</td>
+                                <td>{{ targetInfo.centsToTarget.toFixed(2) }}</td>
+                                <td>{{ targetInfo.profitAtTarget.toFixed(2) }}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
