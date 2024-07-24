@@ -82,9 +82,9 @@
                                 <th>PnL $</th>
                             </tr>
                             <tr v-if="customTarget">
-                                <td>2R</td>
+                                <td>{{ targetRLevel }}R</td>
                                 <td>{{ customTarget.toFixed(2) }}</td>
-                                <td>{{ (customTarget - entry) * positionSize }}</td>
+                                <td>{{ targetProfit.toFixed(2) }}</td>
                             </tr>
                         </table>
                     </div>
@@ -228,6 +228,8 @@
                     riskPerShare: 0,
                     rlevels: [-1, -0.5, 0, 0.5, 1, 2, 3, 4, 5],
                     targetInfo: null,
+                    targetRLevel: 0,
+                    targetProfit: 0,
                 }
             },
             methods: {
@@ -267,8 +269,8 @@
                     this.calculateRisk();
                 },
                 showTarget() {
-                    const targetR = 2; // Assuming target is at 2R
                     const targetPrice = this.customTarget; // Use custom target price
+                    const targetR = (targetPrice - this.entry) / this.riskPerShare; // Calculate R level
                     const centsToTarget = targetPrice - this.entry;
                     const profitAtTarget = (targetPrice - this.entry) * this.positionSize;
 
@@ -277,6 +279,9 @@
                         centsToTarget: centsToTarget,
                         profitAtTarget: profitAtTarget,
                     };
+
+                    this.targetRLevel = targetR; // Set the calculated R level
+                    this.targetProfit = profitAtTarget; // Set the calculated profit
                 }
             }
         });
