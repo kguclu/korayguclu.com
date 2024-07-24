@@ -81,10 +81,10 @@
                                 <th>Target Price $</th>
                                 <th>PnL $</th>
                             </tr>
-                            <tr v-for="r in rlevels" :key="r">
-                                <td>{{ r }}R</td>
-                                <td>{{ (entry + (r * (customTarget - entry))).toFixed(2) }}</td>
-                                <td>{{ ((entry + (r * (customTarget - entry))) - entry) * positionSize }}</td>
+                            <tr v-if="customTarget">
+                                <td>2R</td>
+                                <td>{{ customTarget.toFixed(2) }}</td>
+                                <td>{{ (customTarget - entry) * positionSize }}</td>
                             </tr>
                         </table>
                     </div>
@@ -268,7 +268,7 @@
                 },
                 showTarget() {
                     const targetR = 2; // Assuming target is at 2R
-                    const targetPrice = this.entry + (targetR * this.riskPerShare);
+                    const targetPrice = this.customTarget; // Use custom target price
                     const centsToTarget = targetPrice - this.entry;
                     const profitAtTarget = (targetPrice - this.entry) * this.positionSize;
 
